@@ -1,27 +1,18 @@
-/**
- *
- */
 void initEncoder() {
-  
-  // load float from eeprom(last set temperature value)
+  // load float from eeprom (last set temperature value)
   myEnc.write((long)(eeprom_read_float(0)*40));
   pinMode(encoderTamper, INPUT_PULLUP);
-  
-  // set initial temperature to an invalid value to make sure its reprinted in the first reading
+  // set initial temperature to an invalid value to make sure its output in the first reading
   inputData.tempTarget = 999.99;
 }
 
 float oldPosition  = -999;
 float rawTarget = 0;
 
-/**
- * target temperature (tempTarget) is changable by Encoder
- */
-void setTempTarget() {
-  
+/* target temperature (tempTarget) can be changed through the Encoder */
+void setTempTarget() {  
   long newPosition = myEnc.read() / 4;
-  if (newPosition != oldPosition) {   
-    
+  if (newPosition != oldPosition) {
     oldPosition = newPosition;
     rawTarget =  (newPosition/10.0);
     if (rawTarget > maxTemperature) {
@@ -33,18 +24,11 @@ void setTempTarget() {
       rawTarget = minTemperature;
     }
   }
-  
-  
   if (digitalRead(encoderTamper) == LOW) {
     eeprom_write_float(0, rawTarget);
     Serial.println("Value written:");
     Serial.println(eeprom_read_float(0));
     delay(1000);
   }
-
   inputData.tempTarget = rawTarget;
-
 }
-
-
-
